@@ -27,9 +27,10 @@ export function PricingPlans({ showHeader = true, isPublic = false }: PricingPla
   const { locale } = useLocale();
   const t = translations[locale].subscription;
   const [billingInterval, setBillingInterval] = useState<BillingInterval>('monthly');
-  const { subscription, plans, isLoading, isCheckingOut, checkout, isPro } = useSubscription({
-    skipSubscription: isPublic,
-  });
+  const { subscription, plans, isLoading, isCheckingOut, checkout, checkoutError, isPro } =
+    useSubscription({
+      skipSubscription: isPublic,
+    });
   const searchParams = useSearchParams();
 
   // Get Pro plan data
@@ -248,6 +249,12 @@ export function PricingPlans({ showHeader = true, isPublic = false }: PricingPla
                 t?.upgradeToPro
               )}
             </button>
+          )}
+
+          {checkoutError && !isCheckingOut && (
+            <p role="alert" className="mt-3 text-sm text-center text-red-600 dark:text-red-400">
+              {t?.checkoutError}
+            </p>
           )}
 
           <ul className="mt-8 space-y-4">

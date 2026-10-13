@@ -130,6 +130,16 @@ export class SubscriptionService {
       throw new Error('Stripe is not configured');
     }
 
+    // Only the API-configured Pro prices may be checked out — the price ID comes
+    // from the client, so anything else (e.g. a cheaper price) is rejected.
+    const allowedPriceIds = Object.values(STRIPE_CONFIG.prices).filter(Boolean);
+    if (allowedPriceIds.length === 0) {
+      throw new Error('Stripe prices are not configured');
+    }
+    if (!allowedPriceIds.includes(request.priceId)) {
+      throw new Error('Invalid price ID');
+    }
+
     const stripe = getStripeClient();
     const user = await this.prisma.user.findUnique({
       where: { id: userId },

@@ -91,11 +91,13 @@ export const createCheckoutSession = async (
   successUrl?: string,
   cancelUrl?: string
 ): Promise<CheckoutSessionResponse> => {
-  return apiClient.post<CheckoutSessionResponse>('/api/subscription/checkout', {
-    priceId,
-    successUrl,
-    cancelUrl,
-  });
+  // No retries: each attempt creates a Stripe session, and a failing call would
+  // otherwise burn through the API rate limit on a single click.
+  return apiClient.post<CheckoutSessionResponse>(
+    '/api/subscription/checkout',
+    { priceId, successUrl, cancelUrl },
+    { retries: 0 }
+  );
 };
 
 /**

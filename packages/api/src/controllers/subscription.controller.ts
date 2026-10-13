@@ -101,6 +101,33 @@ export class SubscriptionController {
       const message = (error as Error).message;
       logger.error('Error creating checkout session', { error, userId: req.user?.userId });
 
+      if (message === 'Invalid price ID') {
+        res.status(400).json({
+          success: false,
+          error: 'Validation Error',
+          message: 'Invalid price ID',
+        });
+        return;
+      }
+
+      // An archived/inactive price in Stripe is a configuration problem, not a
+      // transient failure — surface it as 503 and make it easy to grep for.
+      const stripeError = error as { type?: string; param?: string };
+      if (
+        stripeError.type === 'StripeInvalidRequestError' &&
+        stripeError.param?.startsWith('line_items')
+      ) {
+        logger.error('Stripe price is inactive or invalid — check STRIPE_PRICE_PRO_* in Stripe', {
+          priceId: (req.body as CreateCheckoutRequest).priceId,
+        });
+        res.status(503).json({
+          success: false,
+          error: 'Service Unavailable',
+          message: 'Payment system is not configured',
+        });
+        return;
+      }
+
       if (message.includes('not configured')) {
         res.status(503).json({
           success: false,

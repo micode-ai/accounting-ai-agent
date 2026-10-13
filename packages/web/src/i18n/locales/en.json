@@ -1110,6 +1110,7 @@
     "currentPlan": "Current Plan",
     "getStarted": "Get Started",
     "upgradeToPro": "Upgrade to Pro",
+    "checkoutError": "We couldn't start the checkout. Please try again in a few minutes or contact support.",
     "processing": "Processing...",
     "popular": "POPULAR",
     "plans": {
