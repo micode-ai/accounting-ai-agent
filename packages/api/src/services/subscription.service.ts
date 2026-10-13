@@ -165,10 +165,12 @@ export class SubscriptionService {
       });
     }
 
-    // Check if user was referred — apply first-month discount
-    const discounts = user.referredByCode
-      ? [{ coupon: 'first_month_referral' }]
-      : undefined;
+    // A personal coupon (e.g. a goodwill discount) wins over the referral one —
+    // Checkout accepts a single discount and ignores customer-level discounts.
+    const customerCoupon = await this.getCustomerCheckoutCoupon(stripe, customerId);
+    const coupon =
+      customerCoupon ?? (user.referredByCode ? 'first_month_referral' : undefined);
+    const discounts = coupon ? [{ coupon }] : undefined;
 
     // Determine base URL
     const baseUrl = process.env.FRONTEND_URL || 'http://localhost:3001';
@@ -194,6 +196,31 @@ export class SubscriptionService {
       checkoutUrl: session.url,
       sessionId: session.id,
     };
+  }
+
+  /**
+   * Coupon set on the Stripe customer as `metadata.checkout_coupon`, if it is
+   * still redeemable. Never throws — a bad coupon must not block checkout.
+   */
+  private async getCustomerCheckoutCoupon(
+    stripe: Stripe,
+    customerId: string
+  ): Promise<string | undefined> {
+    try {
+      const customer = await stripe.customers.retrieve(customerId);
+      const couponId = customer.deleted ? undefined : customer.metadata?.checkout_coupon;
+      if (!couponId) return undefined;
+
+      const coupon = await stripe.coupons.retrieve(couponId);
+      if (!coupon.valid) {
+        logger.warn('Customer checkout coupon is no longer valid', { customerId, couponId });
+        return undefined;
+      }
+      return coupon.id;
+    } catch (error) {
+      logger.warn('Failed to resolve customer checkout coupon', { customerId, error });
+      return undefined;
+    }
   }
 
   /**
