@@ -1110,6 +1110,7 @@
     "currentPlan": "Aktualny plan",
     "getStarted": "Rozpocznij",
     "upgradeToPro": "Ulepsz do Pro",
+    "checkoutError": "Nie udało się rozpocząć płatności. Spróbuj ponownie za kilka minut lub skontaktuj się z pomocą.",
     "processing": "Przetwarzanie...",
     "popular": "POPULARNE",
     "plans": {

@@ -34,6 +34,7 @@ interface UseSubscriptionReturn {
 
   // Errors
   error: Error | null;
+  checkoutError: Error | null;
 
   // Actions
   checkout: (priceId: string) => void;
@@ -142,6 +143,7 @@ export function useSubscription(options?: UseSubscriptionOptions): UseSubscripti
 
     // Errors
     error: error as Error | null,
+    checkoutError: checkoutMutation.error,
 
     // Actions
     checkout: checkoutMutation.mutate,
