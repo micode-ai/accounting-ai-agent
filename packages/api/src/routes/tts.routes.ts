@@ -12,6 +12,7 @@ import { TTSVoice, TTSModel } from '../services/tts.service';
 import { ttsService } from '../services/tts.instance';
 import { prisma } from '../lib/prisma';
 import { logger } from '../utils/logger';
+import { getTraceClient } from '../services/ai-chat/trace-redaction';
 import { z } from 'zod';
 
 // TTS pricing constants
@@ -24,6 +25,20 @@ const router = Router();
 
 // All routes require authentication
 router.use(authenticate);
+
+/**
+ * A speak request carries only text: it cannot be tied to a conversation. While the user has an AI Budget
+ * connection, the text may restate private figures, so the trace is private (inputs/outputs blanked).
+ * A failed lookup fails closed.
+ */
+async function ttsTraceIsPrivate(userId: string): Promise<boolean> {
+  try {
+    const conn = await prisma.aiBudgetConnection.findUnique({ where: { userId }, select: { status: true } });
+    return !!conn && conn.status !== 'revoked';
+  } catch {
+    return true;
+  }
+}
 
 // Validation schema for TTS request
 const ttsRequestSchema = z.object({
@@ -66,16 +81,18 @@ router.post(
       const costPer1K = TTS_PRICING[model as keyof typeof TTS_PRICING] || TTS_PRICING['tts-1'];
       const estimatedCostUSD = (characterCount / 1000) * costPer1K;
 
-      // Wrap synthesis in traceable for LangSmith visibility
+      // Wrap synthesis in traceable for LangSmith visibility. Never the default client: the redacting one,
+      // or the private one when AI Budget is connected. The audio itself never goes into the trace outputs.
+      const traceClient = getTraceClient({ private: await ttsTraceIsPrivate(userId) });
+      let audioBuffer: Buffer | undefined;
       const synthesizeWithTracing = traceable(
         async () => {
-          const buffer = await ttsService.synthesize(userId, text, {
+          audioBuffer = await ttsService.synthesize(userId, text, {
             voice: voice as TTSVoice,
             model: model as TTSModel,
           });
           // Return with usage info for LangSmith cost tracking
           return {
-            audioBuffer: buffer,
             usage: {
               characters: characterCount,
               cost_usd: parseFloat(estimatedCostUSD.toFixed(6)),
@@ -86,6 +103,7 @@ router.post(
         },
         {
           name: 'tts_manual_speak',
+          ...(traceClient ? { client: traceClient } : {}),
           run_type: 'llm', // Use 'llm' type so LangSmith shows cost column
           metadata: {
             userId,
@@ -100,7 +118,8 @@ router.post(
         }
       );
 
-      const { audioBuffer } = await synthesizeWithTracing();
+      await synthesizeWithTracing();
+      if (!audioBuffer) throw new Error('TTS synthesis returned no audio');
 
       // Save TTS cost to database for reliable tracking
       try {

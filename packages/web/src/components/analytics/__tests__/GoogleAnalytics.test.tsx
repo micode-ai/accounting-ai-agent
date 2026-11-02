@@ -7,7 +7,11 @@ jest.mock('next/navigation', () => ({ usePathname: () => pathname.current }));
 
 // next/script would try to inject real <script> tags into jsdom; the tags
 // themselves are not what this test is about.
-jest.mock('next/script', () => ({ __esModule: true, default: () => null }));
+const scripts: Array<{ id?: string; dangerouslySetInnerHTML?: { __html: string } }> = [];
+jest.mock('next/script', () => ({
+  __esModule: true,
+  default: (props: { id?: string; dangerouslySetInnerHTML?: { __html: string } }) => { scripts.push(props); return null; },
+}));
 
 // The measurement id is captured when @/lib/gtag is first evaluated, and CI has
 // no .env file, so pin it from a hoisted factory that still returns the real module.
@@ -61,5 +65,40 @@ describe('GoogleAnalytics page views', () => {
     rerender(<GoogleAnalytics />);
 
     expect(configCalls()).toHaveLength(0);
+  });
+
+  it('sends no page view for the OAuth completion page (its URL carries a one-time code)', () => {
+    const { rerender } = render(<GoogleAnalytics />);
+    pathname.current = '/settings/integrations/ai-budget/complete';
+    rerender(<GoogleAnalytics />);
+    expect(configCalls()).toHaveLength(0);
+  });
+});
+
+describe('GoogleAnalytics init snippet', () => {
+  function runSnippet(url: string): unknown[][] {
+    scripts.length = 0;
+    window.history.replaceState(null, '', url);
+    render(<GoogleAnalytics />);
+    const html = scripts.find((s) => s.id === 'google-analytics-init')!.dangerouslySetInnerHTML!.__html;
+    (window as unknown as { dataLayer: unknown[] }).dataLayer = [];
+    new Function(html)();
+    return (window as unknown as { dataLayer: IArguments[] }).dataLayer.map((a) => Array.from(a));
+  }
+
+  afterEach(() => window.history.replaceState(null, '', '/'));
+
+  it('on the OAuth completion page sends no page view and never the query string', () => {
+    const calls = runSnippet('/settings/integrations/ai-budget/complete?code=SECRETCODE&state=STATE1');
+    const config = calls.find((c) => c[0] === 'config')!;
+    expect(config[2]).toMatchObject({ send_page_view: false });
+    expect(JSON.stringify(calls)).not.toContain('SECRETCODE');
+  });
+
+  it('on any other page keeps the full page location and sends the page view', () => {
+    const calls = runSnippet('/pricing?utm_source=x');
+    const config = calls.find((c) => c[0] === 'config')!;
+    expect(config[2]).toMatchObject({ send_page_view: true, page_path: '/pricing' });
+    expect(String((config[2] as { page_location: string }).page_location)).toContain('utm_source=x');
   });
 });

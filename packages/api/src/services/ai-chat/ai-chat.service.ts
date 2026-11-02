@@ -20,6 +20,7 @@ import { TTSIntegration } from './tts-integration';
 import { AIMemoryExtractionService } from '../ai-memory/memory-extraction.service';
 import { ConversationRepository } from './conversation-repository';
 import { LangGraphAgentRunner } from './langgraph-agent-runner';
+import { getTraceClient, isTracingEnabled } from './trace-redaction';
 
 export class AIChatService {
   constructor(
@@ -28,7 +29,7 @@ export class AIChatService {
     private readonly ttsIntegration: TTSIntegration,
     private readonly memoryExtractionService?: AIMemoryExtractionService
   ) {
-    if (process.env.LANGCHAIN_TRACING_V2 === 'true') {
+    if (isTracingEnabled()) {
       logger.info('LangSmith tracing enabled');
     }
     logger.info('AIChatService initialized with LangGraph');
@@ -47,14 +48,26 @@ export class AIChatService {
     userId: string,
     content: string,
     provider?: LLMProvider,
-    options?: { ttsEnabled?: boolean }
+    /**
+     * aiBudgetCompanyOnly: the answer goes to an audience other than the user (a Telegram group): AI Budget
+     * gets the company-only scope even though the conversation itself is not shared.
+     */
+    options?: { ttsEnabled?: boolean; aiBudgetCompanyOnly?: boolean }
   ): Promise<ProcessMessageResult> {
+    const conversation = await this.repo.findAuthorized(conversationId, userId);
+    if (!conversation) throw new Error('Conversation not found');
+
+    // Decided before the root run is posted (Ruling 12): the trace is private when the thread already holds
+    // private AI Budget data, or this run sees every account (AI Budget tools bound outside a shared chat).
+    // A private trace posts no inputs or outputs at all; child runs inherit the root's client.
+    const companyOnly = conversation.isShared || options?.aiBudgetCompanyOnly === true;
+    const aiBudget = await this.agentRunner.bindAiBudget(userId, content, companyOnly);
+    const privateTrace = conversation.containsPrivateAiBudgetData || (aiBudget !== null && !companyOnly);
+    const traceClient = getTraceClient({ private: privateTrace });
+
     const processMessage = traceable(
       async (): Promise<ProcessMessageResult> => {
         const startTime = Date.now();
-
-        const conversation = await this.repo.findAuthorized(conversationId, userId);
-        if (!conversation) throw new Error('Conversation not found');
 
         const existingMessages = (conversation.messages as any[]) as ChatMessage[];
 
@@ -71,14 +84,21 @@ export class AIChatService {
           userMessage.authorName = authorName;
         }
 
-        const { response, toolsUsed, actualProvider, actualModel, locale } =
+        const { response, toolsUsed, actualProvider, actualModel, locale, aiBudgetNonCompanyDataUsed } =
           await this.agentRunner.run(
             existingMessages,
             content,
             userId,
             conversationId,
-            provider || 'openai'
+            provider || 'openai',
+            { isShared: conversation.isShared, aiBudget, traceClient }
           );
+
+        // Flag the thread before its content is saved, so private AI Budget data is never stored unflagged
+        // (the share dialog warns on this flag).
+        if (aiBudgetNonCompanyDataUsed) {
+          await this.repo.markContainsPrivateAiBudgetData(conversationId);
+        }
 
         const assistantMessage: ChatMessage = {
           id: uuidv4(),
@@ -121,6 +141,7 @@ export class AIChatService {
       {
         name: 'ai_chat_message',
         run_type: 'chain',
+        client: traceClient,
         metadata: { conversationId, userId, provider: provider || 'openai' },
         tags: [`conv:${conversationId}`, `user:${userId}`],
       }

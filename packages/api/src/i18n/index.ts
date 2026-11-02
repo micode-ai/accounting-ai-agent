@@ -23,6 +23,7 @@ export type KSeFTranslations = typeof plTranslations['ksef'];
 export type BialaListaTranslations = typeof plTranslations['bialaLista'];
 export type TaxCalendarTranslations = typeof plTranslations['taxCalendar'];
 export type TaxRegisterTranslations = typeof plTranslations['taxRegister'];
+export type AiBudgetTranslations = typeof plTranslations['aiBudget'];
 
 const translations: Record<Locale, Translations> = {
   pl: plTranslations,
@@ -104,4 +105,8 @@ export function getTaxCalendarTranslations(locale: Locale = 'pl'): TaxCalendarTr
 
 export function getTaxRegisterTranslations(locale: Locale = 'pl'): TaxRegisterTranslations {
   return getTranslations(locale).taxRegister;
+}
+
+export function getAiBudgetTranslations(locale: Locale = 'pl'): AiBudgetTranslations {
+  return getTranslations(locale).aiBudget;
 }

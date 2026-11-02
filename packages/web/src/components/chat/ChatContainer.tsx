@@ -1,17 +1,19 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { MessageSquarePlus, X, DollarSign, Crown, AlertTriangle, FileCheck, LayoutDashboard, Brain, Building2, Gift, BookmarkCheck } from 'lucide-react';
+import { MessageSquarePlus, X, DollarSign, Crown, AlertTriangle, FileCheck, LayoutDashboard, Brain, Building2, Gift, BookmarkCheck, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AppVersion } from '@/components/ui/app-version';
 import Link from 'next/link';
 import { useChat } from '@/hooks/useChat';
 import { useAuth } from '@/contexts/AuthContext';
+import { useAiBudgetStatus } from '@/hooks/useAiBudget';
 import { useLocale } from '@/contexts/LocaleContext';
 import { ConversationList } from './ConversationList';
 import { MessageList } from './MessageList';
 import { ChatInput } from './ChatInput';
 import { ChatHeader } from './ChatHeader';
+import { SharePrivateDataDialog } from './SharePrivateDataDialog';
 import { WfirmaWelcomeModal } from '@/components/onboarding/WfirmaWelcomeModal';
 import { markFirstLoginComplete } from '@/lib/api/auth';
 import { CurrentPlanBadge, UsageWidget } from '@/components/subscription';
@@ -56,6 +58,7 @@ function ChatContainerInner() {
   } = useChat();
 
   const { user } = useAuth();
+  const aiBudgetAvailable = useAiBudgetStatus().data?.available === true;
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showWfirmaWelcome, setShowWfirmaWelcome] = useState(false);
@@ -65,6 +68,7 @@ function ChatContainerInner() {
   const [showShortcutsPanel, setShowShortcutsPanel] = useState(false);
   const [shortcutPrefill, setShortcutPrefill] = useState<string | undefined>(undefined);
   const { locale, setLocale } = useLocale();
+  const [shareWarningOpen, setShareWarningOpen] = useState(false);
   const t = translations[locale].chat;
   const onboardingTranslations = translations[locale].onboarding;
   const { isPro, isLoading: isLoadingSubscription } = useSubscription();
@@ -283,6 +287,15 @@ function ChatContainerInner() {
                 <LayoutDashboard className="w-4 h-4" />
                 <span>{translations[locale].dashboard.title}</span>
               </Link>
+              {aiBudgetAvailable && (
+                <Link
+                  href="/dashboard/personal"
+                  className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                >
+                  <Lock className="w-4 h-4" />
+                  <span>{translations[locale].aiBudget.personal.navLink}</span>
+                </Link>
+              )}
             </div>
             {/* KSeF link */}
             <div className="py-2 border-b border-gray-200 dark:border-gray-700">
@@ -371,6 +384,8 @@ function ChatContainerInner() {
               ? () => {
                   if (currentConversation.isShared) {
                     unshareConversation(currentConversation.id);
+                  } else if (currentConversation.containsPrivateAiBudgetData) {
+                    setShareWarningOpen(true);
                   } else {
                     shareConversation(currentConversation.id);
                   }
@@ -379,6 +394,16 @@ function ChatContainerInner() {
           }
           isShared={currentConversation?.isShared}
           isOwner={currentConversation?.userId === user?.id}
+        />
+
+        <SharePrivateDataDialog
+          open={shareWarningOpen}
+          onCancel={() => setShareWarningOpen(false)}
+          onConfirm={() => {
+            setShareWarningOpen(false);
+            if (currentConversation) shareConversation(currentConversation.id);
+          }}
+          t={{ ...translations[locale].aiBudget.share }}
         />
 
         {/* Subscription Welcome Banner */}

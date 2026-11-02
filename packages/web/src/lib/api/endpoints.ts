@@ -69,6 +69,19 @@ export const API_ENDPOINTS = {
   // Dashboard
   DASHBOARD: {
     SUMMARY: '/api/dashboard/summary',
+    AI_BUDGET: '/api/dashboard/ai-budget',
+    PERSONAL: '/api/dashboard/personal',
+  },
+
+  // AI Budget integration
+  AI_BUDGET: {
+    STATUS: '/api/integrations/ai-budget/status',
+    CONNECT: '/api/integrations/ai-budget/connect',
+    COMPLETE: '/api/integrations/ai-budget/complete',
+    DISCONNECT: '/api/integrations/ai-budget/disconnect',
+    LABEL: (id: string) => `/api/integrations/ai-budget/accounts/${id}/label`,
+    SYNC: '/api/integrations/ai-budget/sync',
+    DISMISS: '/api/integrations/ai-budget/reconciliation/dismissals',
   },
 
   // Tax Calendar

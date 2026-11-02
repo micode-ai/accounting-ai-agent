@@ -65,6 +65,11 @@ export function MarkdownRenderer({
           {children}
         </MarkdownLink>
       ),
+      // Never load a remote image: chat answers can echo third-party text (e.g. AI Budget merchants),
+      // and an injected `![](https://…?d=…)` would send data to that host the moment it renders.
+      img: ({ alt }) => (
+        <span className="text-gray-500 dark:text-gray-400">{alt ? `[image: ${alt}]` : '[image]'}</span>
+      ),
       table: ({ children }) => (
         <div className="my-2 overflow-x-auto">
           <table className="border-collapse border border-gray-300 dark:border-gray-600 text-xs w-full">

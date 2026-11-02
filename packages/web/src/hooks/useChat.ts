@@ -67,6 +67,7 @@ export interface Conversation {
   createdAt: string;
   updatedAt: string;
   isShared?: boolean;
+  containsPrivateAiBudgetData?: boolean;
   ownerName?: string;
 }
 
@@ -79,6 +80,7 @@ export interface ConversationDetail {
   createdAt: string;
   updatedAt: string;
   isShared?: boolean;
+  containsPrivateAiBudgetData?: boolean;
   organizationId?: string;
   ownerName?: string;
 }

@@ -206,6 +206,7 @@ model User {
   referredBy        Referral?  @relation("referred_by")
   promptShortcuts      UserPromptShortcut[]
   createdOrgShortcuts  OrgPromptShortcut[] @relation("OrgShortcutCreator")
+  aiBudgetConnection   AiBudgetConnection?
 
   @@index([email])
   @@index([googleId])
@@ -296,6 +297,9 @@ model AIConversation {
   organizationId String?  @db.Uuid
   isShared       Boolean  @default(false)
   sharedAt       DateTime?
+
+  // True once a private / other-business AI Budget answer entered the thread
+  containsPrivateAiBudgetData Boolean @default(false)
 
   // Timestamps
   createdAt   DateTime @default(now())
@@ -787,4 +791,111 @@ model AIToolUsage {
   @@index([userId, toolName])
   @@index([userId, createdAt])
   @@map("ai_tool_usage")
+}
+
+// ============================================
+// AI BUDGET INTEGRATION
+// ============================================
+
+enum AiBudgetConnectionStatus {
+  active
+  needs_reconnect
+  revoked
+}
+
+enum AiBudgetLabel {
+  company
+  other_business
+  private
+}
+
+enum AiBudgetLabelSource {
+  auto
+  manual
+}
+
+model AiBudgetConnection {
+  id                   String                   @id @default(uuid()) @db.Uuid
+  userId               String                   @unique @db.Uuid
+  accessTokenEnc       String?                  @db.Text
+  refreshTokenEnc      String?                  @db.Text
+  accessTokenExpiresAt DateTime?
+  scope                String?
+  status               AiBudgetConnectionStatus @default(active)
+  statusChangedAt      DateTime                 @default(now())
+  needsCompanyChoice   Boolean                  @default(false)
+  createdAt            DateTime                 @default(now())
+  updatedAt            DateTime                 @updatedAt
+
+  user     User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accounts AiBudgetAccount[]
+
+  @@map("ai_budget_connections")
+}
+
+model AiBudgetAccount {
+  id             String              @id @default(uuid()) @db.Uuid
+  connectionId   String              @db.Uuid
+  userId         String              @db.Uuid
+  externalId     String
+  name           String
+  type           String
+  currency       String              @db.VarChar(3)
+  access         String
+  active         Boolean             @default(true)
+  inactiveReason String?
+  label          AiBudgetLabel
+  labelSource    AiBudgetLabelSource @default(auto)
+  syncCursor     String?             @db.Text
+  syncGeneration Int                 @default(0)
+  lastSyncedAt   DateTime?
+  lastSyncError  String?
+  fullResyncAt   DateTime?
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+
+  connection AiBudgetConnection                  @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+  expenses   AiBudgetExpense[]
+  dismissals AiBudgetReconciliationDismissal[]
+
+  @@unique([connectionId, externalId])
+  @@index([userId])
+  @@map("ai_budget_accounts")
+}
+
+// Company account mirror only; private and other-business data is never stored here.
+model AiBudgetExpense {
+  id                String   @id @default(uuid()) @db.Uuid
+  accountId         String   @db.Uuid
+  externalId        String
+  amount            Decimal  @db.Decimal(14, 2)
+  currency          String   @db.VarChar(3)
+  date              DateTime @db.Date
+  categoryId        String?
+  categorySplits    Json     @default("[]") @db.JsonB
+  merchant          String?
+  description       String?
+  isDebt            Boolean  @default(false)
+  isSplitReceivable Boolean  @default(false)
+  remoteUpdatedAt   DateTime
+  syncGeneration    Int      @default(0)
+
+  account AiBudgetAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([accountId, externalId])
+  @@index([accountId, date])
+  @@map("ai_budget_expenses")
+}
+
+model AiBudgetReconciliationDismissal {
+  id                String   @id @default(uuid()) @db.Uuid
+  accountId         String   @db.Uuid
+  externalExpenseId String
+  reason            String?
+  createdAt         DateTime @default(now())
+
+  account AiBudgetAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([accountId, externalExpenseId])
+  @@map("ai_budget_reconciliation_dismissals")
 }

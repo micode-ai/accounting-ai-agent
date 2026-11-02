@@ -34,7 +34,10 @@ export class AIChatRouter {
 
     await ctx.sendChatAction('typing');
 
-    const result = await this.aiChatService.sendMessage(conversationId, link.userId, messageText);
+    // Outside a private chat with the bot the answer is posted to everyone in the chat: AI Budget runs with
+    // the company-only scope there, as in a conversation shared with the organization. Unknown → company-only.
+    const aiBudgetCompanyOnly = ctx.chat?.type !== 'private';
+    const result = await this.aiChatService.sendMessage(conversationId, link.userId, messageText, undefined, { aiBudgetCompanyOnly });
 
     const responseText =
       typeof result.assistantMessage.content === 'string' ? result.assistantMessage.content : '';

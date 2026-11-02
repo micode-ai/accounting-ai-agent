@@ -26,6 +26,20 @@ if (result.error) {
   });
 }
 
+// LangSmith stays off in tests whatever a developer .env says (.env.example ships tracing on): a test that
+// needs tracing opts in itself, with the client stubbed. Any LangSmith HTTP call that still slips through
+// (either bundled langsmith copy) is blocked and recorded; tracing tests assert it stays empty.
+process.env.LANGCHAIN_TRACING_V2 = 'false';
+for (const key of ['LANGSMITH_TRACING', 'LANGCHAIN_TRACING', 'LANGSMITH_TRACING_V2', 'LANGCHAIN_API_KEY', 'LANGSMITH_API_KEY']) {
+  delete process.env[key];
+}
+const langsmithOutbound: string[] = [];
+(globalThis as Record<symbol, unknown>)[Symbol.for('ls:fetch_implementation')] = async (url: unknown) => {
+  langsmithOutbound.push(String(url));
+  throw new Error(`Outbound LangSmith request blocked in tests: ${String(url)}`);
+};
+(globalThis as Record<string, unknown>).__langsmithOutbound = langsmithOutbound;
+
 // Mock environment variables for tests (only if not already set)
 process.env.NODE_ENV = process.env.NODE_ENV || 'test';
 process.env.JWT_SECRET = process.env.JWT_SECRET || 'test-jwt-secret-key-min-32-characters-long';

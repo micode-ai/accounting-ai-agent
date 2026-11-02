@@ -10,7 +10,7 @@ import { Locale } from '../../i18n';
  * Main system prompt for AI Chat Service
  * Dynamically built using shared prompt fragments for consistency
  */
-export const getSystemPrompt = (locale: Locale = 'pl', memoryContext?: string): string => {
+export const getSystemPrompt = (locale: Locale = 'pl', memoryContext?: string, extraFragments?: string[]): string => {
   const basePrompt = `You are an expert accountant specializing in Polish tax law and accounting for IT companies.
 
 ## Areas of Expertise
@@ -46,6 +46,7 @@ You have deep knowledge in the following areas:
     includeTaxData: true,
     includeSecurityGuidelines: false, // Security handled at tool level
     memoryContext,
+    extraFragments,
   });
 };
 

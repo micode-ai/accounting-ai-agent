@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react';
 import Script from 'next/script';
 import { usePathname } from 'next/navigation';
 import { useCookieConsent } from '@/contexts/CookieConsentContext';
-import { GA_MEASUREMENT_ID, pageview } from '@/lib/gtag';
+import { GA_MEASUREMENT_ID, NO_PAGE_VIEW_PATHS, isNoPageViewPath, pageview } from '@/lib/gtag';
 
 export function GoogleAnalytics() {
   const { state } = useCookieConsent();
@@ -23,6 +23,7 @@ export function GoogleAnalytics() {
       reportedInitialView.current = true;
       return;
     }
+    if (isNoPageViewPath(pathname)) return;
     pageview(pathname);
   }, [pathname, analyticsConsented]);
 
@@ -44,9 +45,13 @@ export function GoogleAnalytics() {
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
+            var noPageView = ${JSON.stringify(NO_PAGE_VIEW_PATHS)}.some(function (p) {
+              return window.location.pathname === p || window.location.pathname.indexOf(p + '/') === 0;
+            });
             gtag('config', '${GA_MEASUREMENT_ID}', {
               page_path: window.location.pathname,
-              send_page_view: true,
+              page_location: noPageView ? window.location.origin + window.location.pathname : window.location.href,
+              send_page_view: !noPageView,
             });
           `,
         }}

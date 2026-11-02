@@ -784,5 +784,56 @@
     "summary": "Summary",
     "profit": "Profit",
     "loss": "Loss"
+  },
+  "aiBudget": {
+    "label": {
+      "company": "Company",
+      "other_business": "Other business",
+      "private": "Private"
+    },
+    "reconnect": "Connection to AI Budget lost — reconnect it in Settings → Integrations.",
+    "notConnected": "AI Budget is not connected. Connect it in Settings → Integrations.",
+    "syncing": "Company data from AI Budget is still syncing.",
+    "asOf": "Data as of {time}",
+    "readOnly": "This account is read-only in AI Budget; I can't change it.",
+    "inactive": "This AI Budget account is currently unavailable to me (access was limited in AI Budget).",
+    "sharedOnlyCompany": "In a shared conversation only the company account is available.",
+    "noCompany": "No company account is chosen in AI Budget. Choose one in Settings → Integrations.",
+    "unknownAccount": "Account no longer available",
+    "unknownCategory": "Category \"{name}\" not found. Available: {list}",
+    "noMatchingDocument": "No matching document found",
+    "nonSpending": {
+      "debt": "money lent (not spending)",
+      "splitReceivable": "bill share owed back (not spending)"
+    },
+    "created": "Created in AI Budget: {summary}",
+    "updated": "Updated in AI Budget: {summary}",
+    "deleted": "Deleted in AI Budget: {summary}",
+    "totalsHeader": "Totals by currency",
+    "uncategorized": "Uncategorized",
+    "encryptedField": "—",
+    "wfirmaNeeded": "Connect wFirma to compare expenses with documents.",
+    "requestFailed": "AI Budget request failed ({code}). Try again later.",
+    "expenseNotFound": "This expense was not found in that AI Budget account.",
+    "noExpenses": "No expenses found for this period.",
+    "accountNotRead": "Account \"{name}\" could not be read right now: its figures are unknown, not zero.",
+    "searchLimited": "Account \"{name}\" is encrypted in AI Budget: the text search covered only the fields that are not encrypted.",
+    "encryptedWrite": "This account is encrypted in AI Budget; its expenses cannot be changed from here.",
+    "wfirmaError": "wFirma could not be read, so it is unknown which expenses have a document.",
+    "allMatched": "Every company expense in this period has a matching document.",
+    "truncated": "The list is incomplete: there are more expenses than can be read at once.",
+    "showing": "Showing {shown} of {total} expenses.",
+    "nonSpendingHeader": "Not spending (excluded from totals)",
+    "nothingToUpdate": "No field to change was given.",
+    "inactiveShort": "inactive",
+    "syncFailed": "The company data from AI Budget could not be synced yet, so its figures are unknown. Try again later.",
+    "partial": "(incomplete: an account with this label could not be read)",
+    "noAccountForLabel": "No connected AI Budget account has the label \"{label}\".",
+    "noAccounts": "No AI Budget accounts are connected.",
+    "unavailableShort": "unavailable",
+    "access": {
+      "read": "read-only",
+      "read_write": "read and write"
+    }
   }
 }

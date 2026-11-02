@@ -297,7 +297,8 @@
     "saving": "Saving...",
     "cancel": "Cancel",
     "success": "Profile updated successfully",
-    "apiCredentials": "Manage API Credentials"
+    "apiCredentials": "Manage API Credentials",
+    "integrations": "Integrations"
   },
   "apiCredentials": {
     "title": "API Credentials",
@@ -752,6 +753,70 @@
               "title": "Useful links",
               "setupWizard": { "label": "Open the Telegram setup wizard", "href": "/settings/telegram" },
               "telegram": { "label": "Download Telegram — iOS, Android, Desktop", "href": "https://telegram.org" }
+            }
+          }
+        }
+      },
+      "aiBudget": {
+        "title": "AI Budget integration",
+        "description": "Connect AI Budget Assistant, choose your company account and reconcile expenses with wFirma.",
+        "articles": {
+          "connect": {
+            "title": "How to connect AI Budget",
+            "summary": "Link your AI Budget accounts, choose which one is your company and keep private money out of company figures.",
+            "intro": "AI Budget Assistant is a personal and business budgeting app. Once connected, eKsięgowy AI can show your company expenses, answer questions about them in chat and check them against the documents in wFirma. Your private accounts are never mixed into company figures.",
+            "steps": [
+              {
+                "title": "Connect",
+                "body": "Open Settings → Integrations and click Connect on the AI Budget card. You are taken to AI Budget to approve access, then returned here. Make sure you are signed in to the same eKsięgowy AI account in this browser."
+              },
+              {
+                "title": "Choose your accounts' labels",
+                "body": "Each AI Budget account gets one of three labels: Company, Other business or Private. A single business account becomes Company automatically. Personal, shared, trip and investment accounts are Private. You can change any label by hand; a manual label always wins."
+              },
+              {
+                "title": "Choose the company",
+                "body": "If you have several business accounts, none is picked for you: they all show as Other business until you choose which one is your company. Only one account can be the company. Choosing another one moves the previous one to Other business."
+              },
+              {
+                "title": "What Private means",
+                "body": "Private and Other business data is read live when you ask for it and is kept for at most five minutes, encrypted. It is never saved in eKsięgowy AI, never counted in company figures, never used for reconciliation and never sent to wFirma. Only the company account is copied and kept in sync."
+              },
+              {
+                "title": "Reconcile with wFirma",
+                "body": "The dashboard lists company expenses from the previous month until today for which no matching document was found in wFirma (same currency, same amount, date within 7 days). It does not mean an invoice is missing, only that none matched. Connect wFirma to see this card."
+              },
+              {
+                "title": "Dismiss an item",
+                "body": "If an expense needs no document, such as a bank fee, dismiss it from the list. Dismissed items are hidden from the list."
+              },
+              {
+                "title": "Disconnect",
+                "body": "Click Disconnect on the AI Budget card. Access is revoked in AI Budget and the copy of your company expenses is deleted from eKsięgowy AI. You can connect again at any time."
+              }
+            ],
+            "callouts": {
+              "shared": {
+                "variant": "info",
+                "title": "Shared chats see the company only",
+                "body": "In a shared organization chat the assistant sees only the company account. Other accounts are invisible there."
+              },
+              "reconnect": {
+                "variant": "warning",
+                "title": "Reconnect when asked",
+                "body": "If access expires or is withdrawn in AI Budget, the card says Reconnect needed and old figures are not shown as current until you reconnect."
+              }
+            },
+            "links": {
+              "title": "Useful links",
+              "integrations": {
+                "label": "Open Integrations settings",
+                "href": "/settings/integrations"
+              },
+              "aiBudget": {
+                "label": "AI Budget web app",
+                "href": "https://app.ai-budget.pl"
+              }
             }
           }
         }
@@ -1693,5 +1758,119 @@
     "orgSection": "Organisation",
     "personalSection": "Personal",
     "orgReadOnly": "Read-only"
+  },
+  "aiBudget": {
+    "settings": {
+      "title": "AI Budget",
+      "connect": "Connect AI Budget",
+      "reconnect": "Reconnect",
+      "disconnect": "Disconnect",
+      "disconnectConfirm": "Disconnect AI Budget? Synced company data will be removed from this app.",
+      "disconnectRemoteFailed": "Disconnected here, but AI Budget could not be notified. You can remove the connection in AI Budget under Connected apps.",
+      "disconnectExpired": "Disconnected. Access to AI Budget had already expired. If this app is still listed in AI Budget under Connected apps, you can remove it there.",
+      "status": {
+        "active": "Connected",
+        "needs_reconnect": "Needs reconnecting"
+      },
+      "lastSync": "Last sync: {time}",
+      "never": "never",
+      "readOnly": "Read-only",
+      "inactive": "Unavailable",
+      "inactiveReason": {
+        "role": "Your role in this account no longer allows access.",
+        "encrypted": "This account is encrypted and cannot be read.",
+        "grant_inactive": "Access to this account was switched off in AI Budget.",
+        "archived": "This account is archived."
+      },
+      "labelAuto": "Automatic",
+      "labelManual": "Chosen by you",
+      "chooseCompany": "Choose the company account",
+      "chooseCompanyHelp": "You have several business accounts in AI Budget. Pick the one that belongs to this company; the others stay outside the company's books.",
+      "unavailable": "Account no longer available",
+      "connectedToast": "AI Budget connected",
+      "connecting": "Connecting to AI Budget…",
+      "pageTitle": "Integrations",
+      "intro": "Connect external services to bring your data into this app.",
+      "reconnectBanner": "The connection to AI Budget has expired. Reconnect to see current data.",
+      "syncNow": "Sync now",
+      "syncStarted": "Sync started",
+      "cancel": "Cancel",
+      "accountsTitle": "Accounts",
+      "labelFor": "Label for {name}",
+      "completeFailed": "Could not complete the connection.",
+      "backToIntegrations": "Back to integrations",
+      "error": {
+        "invalid_state": "The connection request expired or is invalid. Please try again.",
+        "state_mismatch": "This connection request was started by a different user. Please start it again from your own account.",
+        "access_denied": "Access was not granted in AI Budget.",
+        "exchange_failed": "AI Budget could not complete the connection. Please try again.",
+        "unavailable": "The AI Budget integration is not available right now.",
+        "unknown": "Something went wrong. Please try again."
+      },
+      "accountLabelFailed": "Could not change the label. Please try again.",
+      "accountUnavailableConflict": "This account is no longer available, so it cannot be set as the company account."
+    },
+    "labels": {
+      "company": "Company",
+      "other_business": "Other business",
+      "private": "Private"
+    },
+    "company": {
+      "title": "AI Budget — company",
+      "thisMonth": "This month",
+      "lastMonth": "Last month",
+      "byCategory": "By category",
+      "syncing": "Company data is syncing. Figures will appear shortly.",
+      "syncFailed": "The first sync failed. Try refreshing.",
+      "refreshing": "Updating from AI Budget… The figures are from the last completed sync.",
+      "needsReconnect": "Connection to AI Budget lost. Reconnect it to see current figures.",
+      "noCompanyAccount": "No company account chosen yet.",
+      "companyInactive": "The company account is currently unavailable.",
+      "oneAccountNotRead": "One account could not be read.",
+      "refresh": "Refresh",
+      "notConnected": "AI Budget is not connected.",
+      "error": "Could not load AI Budget data.",
+      "truncated": "Showing partial data: the list was too long to load in full.",
+      "failedAccounts": "{count} accounts could not be read.",
+      "uncategorized": "Uncategorized"
+    },
+    "reconciliation": {
+      "title": "Expenses without a document",
+      "subtitle": "No matching document found in wFirma",
+      "count": "{count} expenses",
+      "total": "Total",
+      "dismiss": "No document needed",
+      "wfirmaNeeded": "Connect wFirma to see which expenses have no matching document.",
+      "wfirmaError": "wFirma could not be checked right now. Try again later.",
+      "allMatched": "Every expense has a matching document.",
+      "noCompany": "No company account chosen yet.",
+      "truncated": "The list is partial: too many expenses to check at once.",
+      "dismissNotFound": "This expense is no longer in the list.",
+      "dismissConflict": "This expense cannot be dismissed right now."
+    },
+    "invite": {
+      "title": "Add your expenses from AI Budget",
+      "body": "Connect AI Budget to see company spending next to your books and spot expenses with no matching document.",
+      "cta": "Connect AI Budget"
+    },
+    "personal": {
+      "title": "Private — outside the company's books",
+      "subtitle": "Your private accounts from AI Budget. Never included in company figures.",
+      "thisMonth": "This month",
+      "trend": "Trend",
+      "byCategory": "By category",
+      "noPrivateAccounts": "No private accounts are connected.",
+      "incomplete": "Some accounts could not be read, so the figures are incomplete.",
+      "truncated": "Showing partial data: the list was too long to load in full.",
+      "navLink": "Private",
+      "error": "Could not load private data.",
+      "notConnected": "AI Budget is not connected.",
+      "needsReconnect": "Connection to AI Budget lost. Reconnect it to see figures."
+    },
+    "share": {
+      "privateDataWarning": "This conversation contains private AI Budget data. Organization members will see the earlier answers.",
+      "confirm": "Share anyway",
+      "cancel": "Cancel"
+    }
   }
 }

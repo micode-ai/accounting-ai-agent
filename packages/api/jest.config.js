@@ -7,6 +7,8 @@ module.exports = {
     '**/__tests__/**/*.ts',
     '**/?(*.)+(spec|test).ts'
   ],
+  // Shared test doubles live in __tests__ but are not suites.
+  testPathIgnorePatterns: ['/node_modules/', '/__tests__/fakes\\.ts$'],
   transform: {
     '^.+\\.ts$': 'ts-jest',
   },

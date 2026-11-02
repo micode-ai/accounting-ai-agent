@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Check, X, Key } from 'lucide-react';
+import { Check, X, Key, Plug } from 'lucide-react';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
@@ -41,6 +42,7 @@ export interface ProfileTranslations {
   cancel: string;
   success: string;
   apiCredentials?: string;
+  integrations?: string;
 }
 
 interface ProfileEditModalProps {
@@ -234,8 +236,8 @@ export function ProfileEditModal({
             </div>
 
             {/* API Credentials Link */}
-            {onOpenApiCredentials && (
-              <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+            <div className="pt-4 border-t border-gray-200 dark:border-gray-700 flex flex-col gap-3">
+              {onOpenApiCredentials && (
                 <button
                   type="button"
                   onClick={() => {
@@ -247,8 +249,16 @@ export function ProfileEditModal({
                   <Key className="h-4 w-4" />
                   {translations.apiCredentials || 'Manage API Credentials'}
                 </button>
-              </div>
-            )}
+              )}
+              <Link
+                href="/settings/integrations"
+                onClick={() => onOpenChange(false)}
+                className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+              >
+                <Plug className="h-4 w-4" />
+                {translations.integrations || 'Integrations'}
+              </Link>
+            </div>
           </DialogBody>
 
           <DialogFooter>

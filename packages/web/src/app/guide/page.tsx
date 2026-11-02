@@ -13,6 +13,7 @@ const TOPICS = [
   { slug: 'ksef', i18nKey: 'ksef' as const },
   { slug: 'wfirma', i18nKey: 'wfirma' as const },
   { slug: 'telegram', i18nKey: 'telegram' as const },
+  { slug: 'ai-budget', i18nKey: 'aiBudget' as const },
 ];
 
 export default function GuideIndexPage() {

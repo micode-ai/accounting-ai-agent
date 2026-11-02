@@ -14,6 +14,14 @@ const SENSITIVE_FIELDS = [
   'wfirmasecretkey',
   'authorization',
   'secret',
+  // OAuth (AI Budget completion and token responses)
+  'code',
+  'state',
+  'code_verifier',
+  'codeverifier',
+  'refresh_token',
+  'access_token',
+  'accesstoken',
 ];
 
 function sanitizeChanges(body: unknown): unknown {

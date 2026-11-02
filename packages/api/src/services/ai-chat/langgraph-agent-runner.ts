@@ -23,6 +23,9 @@ import { getSystemPrompt } from './constants';
 import { detectLocale } from './utils';
 import { createAllTools } from './tools';
 import { AIMemoryService } from '../ai-memory/ai-memory.service';
+import type { AiBudgetChatBinding, AiBudgetChatFactory } from '../ai-budget/ai-budget-chat.factory';
+import type { Client as LangSmithClient } from 'langsmith';
+import { redactingTracerCallbacks } from './trace-redaction';
 
 export interface AgentRunResult {
   response: string;
@@ -30,6 +33,8 @@ export interface AgentRunResult {
   actualProvider: LLMProvider;
   actualModel: string;
   locale: Locale;
+  /** True when an AI Budget tool put private or other-business data into this run. */
+  aiBudgetNonCompanyDataUsed: boolean;
 }
 
 export class LangGraphAgentRunner {
@@ -38,7 +43,8 @@ export class LangGraphAgentRunner {
     private readonly wfirmaFactory: WFirmaServiceFactory,
     private readonly cacheService: WFirmaCacheService,
     private readonly fileStorageService: FileStorageService,
-    private readonly memoryService?: AIMemoryService
+    private readonly memoryService?: AIMemoryService,
+    private readonly aiBudgetFactory: AiBudgetChatFactory | null = null
   ) {}
 
   async run(
@@ -46,7 +52,14 @@ export class LangGraphAgentRunner {
     userMessage: string,
     userId: string,
     conversationId: string,
-    _provider: LLMProvider
+    _provider: LLMProvider,
+    options: {
+      isShared?: boolean;
+      /** A binding made beforehand with `bindAiBudget` (the caller needs it to decide trace privacy). */
+      aiBudget?: AiBudgetChatBinding | null;
+      /** The trace client of the caller's root run; the LangGraph tracer is bound to it. */
+      traceClient?: LangSmithClient;
+    } = {}
   ): Promise<AgentRunResult> {
     const userCreds = await this.credentialsService.getLLMCredentials(userId);
     if (!userCreds?.apiKey) {
@@ -76,19 +89,26 @@ export class LangGraphAgentRunner {
       }
     }
 
-    const systemPrompt = getSystemPrompt(locale, memoryContext);
-    const tools = createAllTools(
-      wfirmaService,
-      this.cacheService,
-      companyEnrichmentService,
-      this.fileStorageService,
-      userId,
-      locale,
-      subscriptionService,
-      hrService,
-      ksefService,
-      ksefContractorService
-    );
+    const aiBudget = options.aiBudget !== undefined
+      ? options.aiBudget
+      : await this.bindAiBudget(userId, userMessage, options.isShared === true);
+
+    const systemPrompt = getSystemPrompt(locale, memoryContext, aiBudget ? [aiBudget.promptFragment] : undefined);
+    const tools = [
+      ...createAllTools(
+        wfirmaService,
+        this.cacheService,
+        companyEnrichmentService,
+        this.fileStorageService,
+        userId,
+        locale,
+        subscriptionService,
+        hrService,
+        ksefService,
+        ksefContractorService
+      ),
+      ...(aiBudget?.tools ?? []),
+    ];
 
     logger.info('Created tools for agent', {
       toolCount: tools.length,
@@ -97,7 +117,10 @@ export class LangGraphAgentRunner {
     });
 
     const modelWithTools = model.bindTools(tools);
-    const toolNode = new ToolNode(tools);
+    // handleToolErrors is explicit; it is already the default in langgraph 0.2.x — keep it so the intent
+    // survives upgrades: a tool that rejects its arguments (zod) answers with an error message the model
+    // can correct, instead of crashing the run.
+    const toolNode = new ToolNode(tools, { handleToolErrors: true });
 
     const callModel = async (state: typeof MessagesAnnotation.State) => {
       const response = await modelWithTools.invoke(state.messages);
@@ -134,6 +157,7 @@ export class LangGraphAgentRunner {
         recursionLimit: 25,
         metadata: { conversationId, userId },
         tags: [`conv:${conversationId}`, `user:${userId}`],
+        callbacks: redactingTracerCallbacks(options.traceClient),
       }
     );
 
@@ -168,7 +192,25 @@ export class LangGraphAgentRunner {
       actualProvider: selectedProvider,
       actualModel: selectedModel || DEFAULT_LLM_CONFIG[selectedProvider].model,
       locale,
+      aiBudgetNonCompanyDataUsed: aiBudget?.nonCompanyDataUsed() ?? false,
     };
+  }
+
+  /**
+   * The optional AI Budget tool group for one run, or null. A shared conversation gets the company-only
+   * scope. A failure here never breaks the chat: the run simply goes without the group. A user with no LLM
+   * key gets null without any AI Budget call: the run itself then refuses with the usual error.
+   */
+  async bindAiBudget(userId: string, userMessage: string, isShared: boolean): Promise<AiBudgetChatBinding | null> {
+    if (!this.aiBudgetFactory) return null;
+    try {
+      const creds = await this.credentialsService.getLLMCredentials(userId);
+      if (!creds?.apiKey) return null;
+      return await this.aiBudgetFactory.forRun(userId, detectLocale(userMessage), { isShared });
+    } catch (err) {
+      logger.warn('Failed to bind AI Budget tools', { userId, error: (err as Error)?.name ?? 'unknown' });
+      return null;
+    }
   }
 
   /**

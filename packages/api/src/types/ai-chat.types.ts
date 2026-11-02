@@ -79,6 +79,8 @@ export interface AIConversationData {
   isShared?: boolean;
   organizationId?: string;
   ownerName?: string;
+  /** The thread holds private or other-business AI Budget data (the share dialog warns). */
+  containsPrivateAiBudgetData?: boolean;
   createdAt: Date;
   updatedAt: Date;
   deletedAt?: Date;
@@ -122,6 +124,7 @@ export interface ConversationListItem {
   messageCount: number;
   isShared?: boolean;
   ownerName?: string;
+  containsPrivateAiBudgetData?: boolean;
   createdAt: Date;
   updatedAt: Date;
 }

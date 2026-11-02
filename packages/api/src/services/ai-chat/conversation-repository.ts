@@ -71,6 +71,7 @@ export class ConversationRepository {
         topic: conv.topic || undefined,
         lastMessage: last?.content?.substring(0, 100),
         messageCount: messages.filter(m => m.role !== 'system').length,
+        containsPrivateAiBudgetData: conv.containsPrivateAiBudgetData || undefined,
         createdAt: conv.createdAt,
         updatedAt: conv.updatedAt,
       };
@@ -104,6 +105,7 @@ export class ConversationRepository {
       isShared: conv.isShared || undefined,
       organizationId: conv.organizationId || undefined,
       ownerName,
+      containsPrivateAiBudgetData: conv.containsPrivateAiBudgetData || undefined,
       createdAt: conv.createdAt,
       updatedAt: conv.updatedAt,
       deletedAt: conv.deletedAt || undefined,
@@ -137,6 +139,7 @@ export class ConversationRepository {
         messageCount: messages.filter(m => m.role !== 'system').length,
         isShared: true,
         ownerName,
+        containsPrivateAiBudgetData: conv.containsPrivateAiBudgetData || undefined,
         createdAt: conv.createdAt,
         updatedAt: conv.updatedAt,
       };
@@ -192,6 +195,14 @@ export class ConversationRepository {
     await this.prisma.aIConversation.update({
       where: { id: conversationId },
       data: { title, messages: messages as any, updatedAt: new Date() },
+    });
+  }
+
+  /** Set once an AI Budget tool put private or other-business data into the thread; never cleared. */
+  async markContainsPrivateAiBudgetData(conversationId: string): Promise<void> {
+    await this.prisma.aIConversation.update({
+      where: { id: conversationId },
+      data: { containsPrivateAiBudgetData: true },
     });
   }
 

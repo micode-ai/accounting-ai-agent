@@ -297,7 +297,8 @@
     "saving": "Zapisywanie...",
     "cancel": "Anuluj",
     "success": "Profil zaktualizowany pomyślnie",
-    "apiCredentials": "Zarządzaj kluczami API"
+    "apiCredentials": "Zarządzaj kluczami API",
+    "integrations": "Integracje"
   },
   "apiCredentials": {
     "title": "Klucze API",
@@ -752,6 +753,70 @@
               "title": "Przydatne linki",
               "setupWizard": { "label": "Otwórz kreator konfiguracji Telegram", "href": "/settings/telegram" },
               "telegram": { "label": "Pobierz Telegram — iOS, Android, Desktop", "href": "https://telegram.org" }
+            }
+          }
+        }
+      },
+      "aiBudget": {
+        "title": "Integracja z AI Budget",
+        "description": "Połącz AI Budget Assistant, wybierz konto firmowe i uzgadniaj wydatki z dokumentami we wFirma.",
+        "articles": {
+          "connect": {
+            "title": "Jak połączyć AI Budget",
+            "summary": "Połącz konta AI Budget, wybierz, które jest firmowe, i nie mieszaj prywatnych pieniędzy z danymi firmy.",
+            "intro": "AI Budget Assistant to aplikacja do budżetu osobistego i firmowego. Po połączeniu eKsięgowy AI pokaże wydatki firmy, odpowie na pytania o nie w czacie i porówna je z dokumentami we wFirma. Konta prywatne nigdy nie trafiają do danych firmy.",
+            "steps": [
+              {
+                "title": "Połącz",
+                "body": "Wejdź w Ustawienia → Integracje i kliknij Połącz na karcie AI Budget. Przejdziesz do AI Budget, aby zatwierdzić dostęp, a potem wrócisz tutaj. Upewnij się, że w tej przeglądarce jesteś zalogowany na to samo konto eKsięgowy AI."
+              },
+              {
+                "title": "Etykiety kont",
+                "body": "Każde konto AI Budget dostaje jedną z trzech etykiet: Firma, Inna działalność lub Prywatne. Jedyne konto biznesowe automatycznie staje się Firmą. Konta osobiste, wspólne, wyjazdowe i inwestycyjne są Prywatne. Etykietę można zmienić ręcznie; ręczna etykieta ma zawsze pierwszeństwo."
+              },
+              {
+                "title": "Wybór konta firmowego",
+                "body": "Jeśli masz kilka kont biznesowych, żadne nie jest wybierane za Ciebie: wszystkie są oznaczone jako Inna działalność, dopóki nie wskażesz firmy. Firmą może być tylko jedno konto. Wybór innego przenosi poprzednie do Innej działalności."
+              },
+              {
+                "title": "Co oznacza Prywatne",
+                "body": "Dane Prywatne i Innej działalności są pobierane na żywo, gdy o nie pytasz, i przechowywane najwyżej pięć minut, w postaci zaszyfrowanej. Nie są zapisywane w eKsięgowy AI, nie wchodzą do danych firmy, do uzgadniania ani do wFirma. Kopiowane i synchronizowane jest tylko konto firmowe."
+              },
+              {
+                "title": "Uzgadnianie z wFirma",
+                "body": "Pulpit pokazuje wydatki firmy od poprzedniego miesiąca do dziś, dla których nie znaleziono pasującego dokumentu we wFirma (ta sama waluta, ta sama kwota, data w granicach 7 dni). To nie znaczy, że brakuje faktury, tylko że żadna nie pasuje. Aby zobaczyć tę kartę, połącz wFirma."
+              },
+              {
+                "title": "Pomiń pozycję",
+                "body": "Jeśli wydatek nie wymaga dokumentu, na przykład opłata bankowa, pomiń go na liście. Pominięte pozycje są ukryte na liście."
+              },
+              {
+                "title": "Rozłącz",
+                "body": "Kliknij Rozłącz na karcie AI Budget. Dostęp zostanie cofnięty w AI Budget, a kopia wydatków firmy usunięta z eKsięgowy AI. Możesz połączyć ponownie w dowolnej chwili."
+              }
+            ],
+            "callouts": {
+              "shared": {
+                "variant": "info",
+                "title": "Czaty wspólne widzą tylko firmę",
+                "body": "We wspólnym czacie organizacji asystent widzi tylko konto firmowe. Pozostałe konta są tam niewidoczne."
+              },
+              "reconnect": {
+                "variant": "warning",
+                "title": "Połącz ponownie, gdy trzeba",
+                "body": "Jeśli dostęp wygaśnie lub zostanie cofnięty w AI Budget, karta pokaże Wymagane ponowne połączenie, a stare dane nie będą prezentowane jako aktualne do czasu ponownego połączenia."
+              }
+            },
+            "links": {
+              "title": "Przydatne linki",
+              "integrations": {
+                "label": "Otwórz ustawienia integracji",
+                "href": "/settings/integrations"
+              },
+              "aiBudget": {
+                "label": "Aplikacja webowa AI Budget",
+                "href": "https://app.ai-budget.pl"
+              }
             }
           }
         }
@@ -1693,5 +1758,119 @@
     "orgSection": "Organizacja",
     "personalSection": "Osobiste",
     "orgReadOnly": "Tylko do odczytu"
+  },
+  "aiBudget": {
+    "settings": {
+      "title": "AI Budget",
+      "connect": "Połącz AI Budget",
+      "reconnect": "Połącz ponownie",
+      "disconnect": "Rozłącz",
+      "disconnectConfirm": "Rozłączyć AI Budget? Zsynchronizowane dane firmy zostaną usunięte z tej aplikacji.",
+      "disconnectRemoteFailed": "Rozłączono tutaj, ale nie udało się powiadomić AI Budget. Możesz usunąć połączenie w AI Budget w sekcji Połączone aplikacje.",
+      "disconnectExpired": "Rozłączono. Dostęp do AI Budget już wcześniej wygasł. Jeśli ta aplikacja nadal widnieje w AI Budget w sekcji Połączone aplikacje, możesz ją tam usunąć.",
+      "status": {
+        "active": "Połączono",
+        "needs_reconnect": "Wymaga ponownego połączenia"
+      },
+      "lastSync": "Ostatnia synchronizacja: {time}",
+      "never": "nigdy",
+      "readOnly": "Tylko do odczytu",
+      "inactive": "Niedostępne",
+      "inactiveReason": {
+        "role": "Twoja rola na tym koncie nie pozwala już na dostęp.",
+        "encrypted": "To konto jest zaszyfrowane i nie można go odczytać.",
+        "grant_inactive": "Dostęp do tego konta został wyłączony w AI Budget.",
+        "archived": "To konto jest zarchiwizowane."
+      },
+      "labelAuto": "Automatycznie",
+      "labelManual": "Wybrane przez Ciebie",
+      "chooseCompany": "Wybierz konto firmowe",
+      "chooseCompanyHelp": "Masz w AI Budget kilka kont firmowych. Wybierz to, które należy do tej firmy; pozostałe zostają poza księgami firmy.",
+      "unavailable": "Konto nie jest już dostępne",
+      "connectedToast": "Połączono z AI Budget",
+      "connecting": "Łączenie z AI Budget…",
+      "pageTitle": "Integracje",
+      "intro": "Połącz zewnętrzne usługi, aby zasilić tę aplikację swoimi danymi.",
+      "reconnectBanner": "Połączenie z AI Budget wygasło. Połącz ponownie, aby zobaczyć aktualne dane.",
+      "syncNow": "Synchronizuj teraz",
+      "syncStarted": "Synchronizacja rozpoczęta",
+      "cancel": "Anuluj",
+      "accountsTitle": "Konta",
+      "labelFor": "Etykieta dla {name}",
+      "completeFailed": "Nie udało się dokończyć połączenia.",
+      "backToIntegrations": "Wróć do integracji",
+      "error": {
+        "invalid_state": "Prośba o połączenie wygasła lub jest nieprawidłowa. Spróbuj ponownie.",
+        "state_mismatch": "Tę prośbę o połączenie rozpoczął inny użytkownik. Rozpocznij ją ponownie ze swojego konta.",
+        "access_denied": "Dostęp nie został przyznany w AI Budget.",
+        "exchange_failed": "AI Budget nie mógł dokończyć połączenia. Spróbuj ponownie.",
+        "unavailable": "Integracja z AI Budget jest teraz niedostępna.",
+        "unknown": "Coś poszło nie tak. Spróbuj ponownie."
+      },
+      "accountLabelFailed": "Nie udało się zmienić etykiety. Spróbuj ponownie.",
+      "accountUnavailableConflict": "To konto nie jest już dostępne, więc nie można ustawić go jako konta firmowego."
+    },
+    "labels": {
+      "company": "Firma",
+      "other_business": "Inna działalność",
+      "private": "Prywatne"
+    },
+    "company": {
+      "title": "AI Budget — firma",
+      "thisMonth": "Ten miesiąc",
+      "lastMonth": "Poprzedni miesiąc",
+      "byCategory": "Według kategorii",
+      "syncing": "Dane firmy są synchronizowane. Liczby pojawią się za chwilę.",
+      "syncFailed": "Pierwsza synchronizacja się nie powiodła. Spróbuj odświeżyć.",
+      "refreshing": "Aktualizacja z AI Budget… Dane pochodzą z ostatniej zakończonej synchronizacji.",
+      "needsReconnect": "Utracono połączenie z AI Budget. Połącz ponownie, aby zobaczyć aktualne dane.",
+      "noCompanyAccount": "Nie wybrano jeszcze konta firmowego.",
+      "companyInactive": "Konto firmowe jest obecnie niedostępne.",
+      "oneAccountNotRead": "Jednego konta nie udało się odczytać.",
+      "refresh": "Odśwież",
+      "notConnected": "AI Budget nie jest połączony.",
+      "error": "Nie udało się wczytać danych z AI Budget.",
+      "truncated": "Pokazano część danych: lista była zbyt długa, by wczytać ją w całości.",
+      "failedAccounts": "Nie udało się odczytać kont: {count}.",
+      "uncategorized": "Bez kategorii"
+    },
+    "reconciliation": {
+      "title": "Wydatki bez dokumentu",
+      "subtitle": "Nie znaleziono pasującego dokumentu w wFirma",
+      "count": "Wydatki: {count}",
+      "total": "Razem",
+      "dismiss": "Dokument niepotrzebny",
+      "wfirmaNeeded": "Połącz wFirma, aby zobaczyć, które wydatki nie mają pasującego dokumentu.",
+      "wfirmaError": "Nie udało się teraz sprawdzić wFirma. Spróbuj później.",
+      "allMatched": "Każdy wydatek ma pasujący dokument.",
+      "noCompany": "Nie wybrano jeszcze konta firmowego.",
+      "truncated": "Lista jest niepełna: zbyt wiele wydatków do sprawdzenia naraz.",
+      "dismissNotFound": "Tego wydatku nie ma już na liście.",
+      "dismissConflict": "Nie można teraz odrzucić tego wydatku."
+    },
+    "invite": {
+      "title": "Dodaj swoje wydatki z AI Budget",
+      "body": "Połącz AI Budget, aby widzieć wydatki firmy obok ksiąg i wychwytywać wydatki bez pasującego dokumentu.",
+      "cta": "Połącz AI Budget"
+    },
+    "personal": {
+      "title": "Prywatne — poza księgami firmy",
+      "subtitle": "Twoje prywatne konta z AI Budget. Nigdy nie wchodzą do liczb firmy.",
+      "thisMonth": "Ten miesiąc",
+      "trend": "Trend",
+      "byCategory": "Według kategorii",
+      "noPrivateAccounts": "Brak połączonych kont prywatnych.",
+      "incomplete": "Niektórych kont nie udało się odczytać, więc dane są niepełne.",
+      "truncated": "Pokazano część danych: lista była zbyt długa, by wczytać ją w całości.",
+      "navLink": "Prywatne",
+      "error": "Nie udało się wczytać danych prywatnych.",
+      "notConnected": "AI Budget nie jest połączony.",
+      "needsReconnect": "Utracono połączenie z AI Budget. Połącz ponownie, aby zobaczyć dane."
+    },
+    "share": {
+      "privateDataWarning": "Ta rozmowa zawiera prywatne dane z AI Budget. Członkowie organizacji zobaczą wcześniejsze odpowiedzi.",
+      "confirm": "Udostępnij mimo to",
+      "cancel": "Anuluj"
+    }
   }
 }

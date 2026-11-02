@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Globe, User, LogOut, Shield, MoreVertical, HelpCircle } from 'lucide-react';
+import { Globe, User, LogOut, Shield, MoreVertical, HelpCircle, Plug } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
@@ -160,6 +160,16 @@ export function HeaderUserMenu({
               <User className="w-4 h-4" />
               {profileTranslations.title}
             </button>
+
+            {/* Integrations */}
+            <Link
+              href="/settings/integrations"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+            >
+              <Plug className="w-4 h-4" />
+              {profileTranslations.integrations || 'Integrations'}
+            </Link>
 
             {/* Language */}
             <div className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300">

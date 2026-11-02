@@ -1,0 +1,15 @@
+export { AI_BUDGET_SCOPES, getAiBudgetConfig, type AiBudgetConfig } from './ai-budget.config';
+export * from './ai-budget.types';
+export * from './ai-budget-errors';
+export type { AccountRow, AiBudgetRepository, MirrorExpenseRow } from './ai-budget.repository';
+export { AiBudgetAccountsService } from './ai-budget-accounts.service';
+export { AiBudgetApiClient } from './ai-budget-api.client';
+export { AiBudgetLiveReadService, LIVE_CACHE_TTL_SECONDS, LIVE_MAX_PAGES, type LiveExpenseFilter } from './ai-budget-live.service';
+export { AiBudgetMirrorSyncService, type SyncOutcome } from './ai-budget-sync.service';
+export { AiBudgetOAuthService, AiBudgetUnavailableError, OAUTH_STATE_TTL_SECONDS, pkcePair, toAccountDto } from './ai-budget-oauth.service';
+export { aiBudget, buildAiBudget, type AiBudgetServices } from './ai-budget.instance';
+export { AiBudgetReconciliationService, RECON_CACHE_TTL_SECONDS, RECON_TOP_ITEMS } from './ai-budget-reconciliation.service';
+export type { ReconciliationDto, UnmatchedItemDto, UnmatchedListResult } from './ai-budget-api.types';
+export { AiBudgetDashboardService } from './ai-budget-dashboard.service';
+export { AiBudgetExpensesService, AiBudgetWriteRefused, CHAT_SYNC_BOUND_MS, type ExpenseView, type ExpenseQuery, type ExpenseQueryResult } from './ai-budget-expenses.service';
+export { AiBudgetChatFactory, type AiBudgetChatBinding } from './ai-budget-chat.factory';

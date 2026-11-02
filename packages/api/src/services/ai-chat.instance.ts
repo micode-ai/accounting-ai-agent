@@ -15,6 +15,8 @@ import { TTSIntegration } from './ai-chat/tts-integration';
 import { ttsService } from './tts.instance';
 import { aiMemoryService } from './ai-memory/ai-memory.instance';
 import { memoryExtractionService } from './ai-memory/memory-extraction.instance';
+import { aiBudget } from './ai-budget/ai-budget.instance';
+import { AiBudgetChatFactory } from './ai-budget/ai-budget-chat.factory';
 
 const conversationRepo = new ConversationRepository(prisma);
 
@@ -23,7 +25,9 @@ const agentRunner = new LangGraphAgentRunner(
   wfirmaServiceFactory,
   wfirmaCacheService,
   fileStorageService,
-  aiMemoryService
+  aiMemoryService,
+  // null when the integration is not configured: the AI Budget tool group is hidden.
+  aiBudget ? new AiBudgetChatFactory(aiBudget) : null
 );
 
 const ttsIntegration = new TTSIntegration(ttsService, prisma);

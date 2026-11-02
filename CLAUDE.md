@@ -63,6 +63,7 @@ routes/      → controllers/      → services/      → Prisma/Redis
 - **TelegramBotService** - Telegraf chatbot orchestrator; account linking via 6-digit codes. Delegates to sub-modules: `AIChatRouter` (text → AIChatService), `OcrFlowHandler` (photo → receipt OCR → expense), `TelegramRateLimiter` (Redis-backed per-user limits)
 - **TaxDeadlineReminderService** - Hourly scheduler (started in `index.ts`) that proactively DMs linked Telegram users about upcoming Polish tax deadlines; deduped per day via Redis
 - **ReferralService** - Referral program with Stripe credit rewards and coupon discounts
+- **AiBudget\*** (`services/ai-budget/`) - AI Budget Assistant integration: OAuth+PKCE connection (`AiBudgetOAuthService`, `AiBudgetTokenManager` with refresh lock), account labels (`AiBudgetAccountsService`), company-only mirror sync (`AiBudgetSyncService` + 15-min job), live encrypted <=300 s reads for other accounts (`AiBudgetLiveService`), reconciliation against wFirma, chat tools (`AiBudgetChatFactory`). See `docs/AI_BUDGET_INTEGRATION.md`
 - **TaxCalendarService** - Polish statutory tax deadlines (VAT, CIT, PIT, ZUS, PCC, dividends) with weekend/holiday shifting
 
 ### Frontend Structure (packages/web/src/)
@@ -85,6 +86,7 @@ PostgreSQL with Prisma ORM. Key models: User, AIConversation, Organization, Tele
 ## Environment
 
 API requires `.env` with: DATABASE_URL, REDIS_URL, JWT_SECRET, WFIRMA_* credentials, TELEGRAM_CHATBOT_TOKEN (optional)
+AI Budget integration (optional, feature hidden when incomplete): AI_BUDGET_CLIENT_ID, AI_BUDGET_CLIENT_SECRET, AI_BUDGET_API_URL, AI_BUDGET_AUTHORIZE_URL, plus BACKEND_URL (= https://api.eksiegowyai.pl in prod; the redirect URI is `${BACKEND_URL}/api/integrations/ai-budget/callback`), FRONTEND_URL and CREDENTIALS_ENCRYPTION_KEY; needs Redis >= 6.2 (GETDEL)
 Web requires `.env.local` with: NEXT_PUBLIC_API_URL
 
 ## Key Patterns
@@ -102,12 +104,13 @@ Web requires `.env.local` with: NEXT_PUBLIC_API_URL
 - Organizations: users grouped by company name, org-level roles (admin/member), membership approval flow
 - Shared conversations: org members share AI chats, real-time polling (5s messages, 10s list)
 - Telegram bot: AI chat via Telegraf, account linking via 6-digit Redis codes
+- AI Budget: company/private never mix. Only the company account is stored (mirror); private/other-business data is live, encrypted in Redis for <=300 s, never logged or put in AI memory; resolve the company only via `getCompanyAccount`; never call `/oauth/revoke` except on user disconnect
 - Referral program: unique 8-char codes, Stripe credit for referrer (max 10/year), 20% coupon for referred, 7-day revocation window
 
 ## Documentation
 
 Detailed docs in `packages/api/docs/` (API.md, ARCHITECTURE.md, AUTH_API.md)
-Feature docs: `docs/ORGANIZATIONS_AND_SHARING.md`, `docs/WFIRMA_INTEGRATION.md`, `docs/STRIPE_SETUP.md`, `docs/REFERRAL_PROGRAM.md`
+Feature docs: `docs/ORGANIZATIONS_AND_SHARING.md`, `docs/WFIRMA_INTEGRATION.md`, `docs/AI_BUDGET_INTEGRATION.md`, `docs/STRIPE_SETUP.md`, `docs/REFERRAL_PROGRAM.md`
 Service docs: `packages/api/src/services/README.wfirma.md`, `README.cache.md`, `README.tts.md`
 
 ## Claude Code Subagents

@@ -784,5 +784,56 @@
     "summary": "Podsumowanie",
     "profit": "Zysk",
     "loss": "Strata"
+  },
+  "aiBudget": {
+    "label": {
+      "company": "Firma",
+      "other_business": "Inna działalność",
+      "private": "Prywatne"
+    },
+    "reconnect": "Utracono połączenie z AI Budget — połącz ponownie w Ustawienia → Integracje.",
+    "notConnected": "AI Budget nie jest połączony. Połącz go w Ustawienia → Integracje.",
+    "syncing": "Dane firmy z AI Budget są jeszcze synchronizowane.",
+    "asOf": "Dane na {time}",
+    "readOnly": "To konto jest w AI Budget tylko do odczytu; nie mogę go zmieniać.",
+    "inactive": "To konto AI Budget jest obecnie dla mnie niedostępne (dostęp został ograniczony w AI Budget).",
+    "sharedOnlyCompany": "We wspólnej rozmowie dostępne jest tylko konto firmowe.",
+    "noCompany": "W AI Budget nie wybrano konta firmowego. Wybierz je w Ustawienia → Integracje.",
+    "unknownAccount": "Konto nie jest już dostępne",
+    "unknownCategory": "Nie znaleziono kategorii „{name}”. Dostępne: {list}",
+    "noMatchingDocument": "Nie znaleziono pasującego dokumentu",
+    "nonSpending": {
+      "debt": "pożyczone pieniądze (nie wydatek)",
+      "splitReceivable": "udział w rachunku do zwrotu (nie wydatek)"
+    },
+    "created": "Utworzono w AI Budget: {summary}",
+    "updated": "Zaktualizowano w AI Budget: {summary}",
+    "deleted": "Usunięto w AI Budget: {summary}",
+    "totalsHeader": "Sumy według walut",
+    "uncategorized": "Bez kategorii",
+    "encryptedField": "—",
+    "wfirmaNeeded": "Połącz wFirma, aby porównać wydatki z dokumentami.",
+    "requestFailed": "Zapytanie do AI Budget nie powiodło się ({code}). Spróbuj ponownie później.",
+    "expenseNotFound": "Nie znaleziono tego wydatku na tym koncie AI Budget.",
+    "noExpenses": "Brak wydatków w tym okresie.",
+    "accountNotRead": "Nie udało się teraz odczytać konta „{name}”: jego kwoty są nieznane, a nie zerowe.",
+    "searchLimited": "Konto „{name}” jest zaszyfrowane w AI Budget: wyszukiwanie tekstu objęło tylko niezaszyfrowane pola.",
+    "encryptedWrite": "To konto jest zaszyfrowane w AI Budget; jego wydatków nie można tu zmieniać.",
+    "wfirmaError": "Nie udało się odczytać wFirma, więc nie wiadomo, które wydatki mają dokument.",
+    "allMatched": "Każdy wydatek firmy w tym okresie ma pasujący dokument.",
+    "truncated": "Lista jest niepełna: wydatków jest więcej, niż można odczytać naraz.",
+    "showing": "Pokazano {shown} z {total} wydatków.",
+    "nonSpendingHeader": "Nie są wydatkami (pominięte w sumach)",
+    "nothingToUpdate": "Nie podano żadnego pola do zmiany.",
+    "inactiveShort": "nieaktywne",
+    "syncFailed": "Nie udało się jeszcze zsynchronizować danych firmy z AI Budget, więc ich kwoty są nieznane. Spróbuj ponownie później.",
+    "partial": "(niepełne: nie udało się odczytać konta z tą etykietą)",
+    "noAccountForLabel": "Żadne połączone konto AI Budget nie ma etykiety „{label}”.",
+    "noAccounts": "Nie połączono żadnych kont AI Budget.",
+    "unavailableShort": "niedostępne",
+    "access": {
+      "read": "tylko odczyt",
+      "read_write": "odczyt i zapis"
+    }
   }
 }

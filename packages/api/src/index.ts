@@ -5,6 +5,10 @@ import './config/env';
 import { initSentry, Sentry } from './lib/sentry';
 initSentry();
 
+// LangSmith traces never carry AI Budget data: install the redacting client before any chat runs.
+import { installTraceRedaction } from './services/ai-chat/trace-redaction';
+installTraceRedaction();
+
 import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -30,6 +34,10 @@ import telegramBotRoutes from './routes/telegram-bot.routes';
 import taxCalendarRoutes from './routes/tax-calendar.routes';
 import promptShortcutRoutes from './routes/prompt-shortcut.routes';
 import orgPromptShortcutRoutes from './routes/org-prompt-shortcut.routes';
+import aiBudgetRoutes from './routes/ai-budget.routes';
+import { aiBudget } from './services/ai-budget/ai-budget.instance';
+import { AiBudgetSyncJob } from './services/ai-budget/ai-budget-sync.job';
+import { redis } from './lib/redis';
 import { telegramBotService, taxDeadlineReminderService } from './services/telegram-bot';
 import { globalRateLimiter } from './middleware/rate-limiter.middleware';
 import { auditLogMiddleware } from './middleware/audit-log.middleware';
@@ -38,6 +46,8 @@ import { logger } from './utils/logger';
 import { seedHelpTopicsIfEmpty } from './services/help-seed.service';
 import { ksefStatusPoller } from './services/ksef';
 import { healthMonitorService } from './services/health';
+
+const aiBudgetSyncJob = aiBudget ? new AiBudgetSyncJob({ repo: aiBudget.repo, accounts: aiBudget.accounts, sync: aiBudget.sync, redis }) : null;
 
 const app: Application = express();
 const PORT = process.env.PORT || 3011;
@@ -149,6 +159,9 @@ app.use('/api/ai/shortcuts', promptShortcutRoutes);
 // Org shared prompt shortcuts (org admin manages, all members read)
 app.use('/api/organization/shortcuts', orgPromptShortcutRoutes);
 
+// AI Budget integration (OAuth connect/callback, status, labels, sync)
+app.use('/api/integrations/ai-budget', aiBudgetRoutes);
+
 // 404 handler
 app.use(notFoundHandler);
 
@@ -175,6 +188,9 @@ const server = app.listen(PORT, async () => {
 
   // Start tax deadline reminder service (proactive Telegram notifications)
   taxDeadlineReminderService.start();
+
+  // AI Budget: 15-minute mirror sync + 30-day reconnect cleanup (only when the integration is configured)
+  aiBudgetSyncJob?.start();
 
   // Start Telegram chatbot
   if (telegramBotService.isInitialized()) {
@@ -203,6 +219,7 @@ const shutdown = () => {
   ksefStatusPoller.stop();
   healthMonitorService.stop();
   taxDeadlineReminderService.stop();
+  aiBudgetSyncJob?.stop();
   telegramBotService.stop();
   server.close(() => {
     logger.info('Server closed');

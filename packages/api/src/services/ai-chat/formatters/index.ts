@@ -110,3 +110,11 @@ export {
 export {
   formatBankAccountVerification,
 } from './biala-lista.formatter';
+export {
+  formatAiBudgetAccounts,
+  formatAiBudgetExpenses,
+  formatAiBudgetSummary,
+  formatAiBudgetWrite,
+  formatAiBudgetDeleted,
+  formatAiBudgetUnmatched,
+} from './ai-budget.formatter';

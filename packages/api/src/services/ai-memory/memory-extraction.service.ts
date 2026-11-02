@@ -3,6 +3,7 @@ import { logger } from '../../utils/logger';
 import { Locale } from '../../i18n';
 import { AIMemoryService } from './ai-memory.service';
 import { sanitizeForPrompt } from '../ai-chat/utils';
+import { isAiBudgetTool } from '../ai-chat/tools/ai-budget.tools';
 
 // ============================================
 // TYPES
@@ -84,13 +85,20 @@ export class AIMemoryExtractionService {
     _locale: Locale
   ): Promise<void> {
     try {
+      // AI Budget data never reaches AI memory: its tool names are not tracked, and an exchange that
+      // used one is not mined for preferences (the message may be about private spending).
+      const usedAiBudget = toolsUsed.some(isAiBudgetTool);
+      const trackedTools = usedAiBudget ? toolsUsed.filter(name => !isAiBudgetTool(name)) : toolsUsed;
+
       // Strategy 1: Track tool usage
-      if (toolsUsed.length > 0) {
-        await this.trackToolUsage(userId, conversationId, toolsUsed);
+      if (trackedTools.length > 0) {
+        await this.trackToolUsage(userId, conversationId, trackedTools);
       }
 
       // Strategy 2: Extract explicit preferences from user message
-      await this.extractExplicitPreferences(userId, conversationId, userMessage);
+      if (!usedAiBudget) {
+        await this.extractExplicitPreferences(userId, conversationId, userMessage);
+      }
 
       // Strategy 3: Analyze tool patterns (runs periodically)
       await this.analyzeToolPatterns(userId, conversationId);

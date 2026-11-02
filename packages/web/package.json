@@ -8,7 +8,7 @@
     "start": "next start",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:e2e": "playwright test tests/e2e/auth tests/e2e/chat tests/e2e/subscription tests/e2e/admin tests/e2e/profile tests/e2e/i18n tests/e2e/guide",
+    "test:e2e": "playwright test tests/e2e/auth tests/e2e/chat tests/e2e/subscription tests/e2e/admin tests/e2e/profile tests/e2e/i18n tests/e2e/guide tests/e2e/integrations",
     "test:e2e:ai-tools": "playwright test tests/e2e/ai-tools",
     "test:e2e:all": "playwright test",
     "test:e2e:ui": "playwright test --ui",
