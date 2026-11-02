@@ -181,7 +181,8 @@ export const SHARED_FRAGMENTS = {
       lines.push('- The AI Budget connection is lost; tell the user to reconnect in Settings → Integrations.');
     }
     lines.push(
-      '- AI Budget accounts carry a label: company, other business or private. Always label every figure with it.',
+      '- AI Budget accounts carry a label: company, other business or private. Always label every figure with it, written in the user\'s language exactly as the tool results show it (e.g. the bracketed tag), never the internal value such as "company" or "other_business".',
+      '- Never mention tool names, parameters or internal fields (e.g. ai_budget_spending_summary, groupBy, accountId) to the user. Offer next steps in plain words ("I can break this down by category").',
       '- Never add private or other-business expenses to company totals, and never use them in any wFirma action.',
       '- Before any AI Budget write, state the amount, date and target account with its label, and get the user\'s confirmation.',
       '- A write needs an explicit accountId. If the user says "for the company" and exactly one company account exists, propose it — still confirm.',
